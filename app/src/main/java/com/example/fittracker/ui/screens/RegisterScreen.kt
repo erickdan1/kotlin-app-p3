@@ -47,11 +47,3 @@ fun RegisterScreen(navController: NavController, viewModel: UserViewModel) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun RegisterScreenPreview() {
-    val navController = rememberNavController()
-    val viewModel: UserViewModel = viewModel()
-    RegisterScreen(navController, viewModel)
-}

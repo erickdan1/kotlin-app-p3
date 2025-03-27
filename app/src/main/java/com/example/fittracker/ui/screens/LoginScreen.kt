@@ -56,11 +56,3 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    val navController = rememberNavController()
-    val viewModel: UserViewModel = viewModel()
-    LoginScreen(navController, viewModel)
-}
