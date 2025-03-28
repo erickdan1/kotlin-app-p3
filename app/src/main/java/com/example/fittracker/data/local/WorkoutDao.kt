@@ -14,6 +14,9 @@ interface WorkoutDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWorkout(workout: Workout)
 
+    @Query("SELECT * FROM workout ORDER BY date DESC LIMIT :limit OFFSET :offset")
+    suspend fun getWorkoutsPaged(limit: Int, offset: Int): List<Workout>
+
     // Retorna os 5 treinos mais recentes
     @Query("SELECT * FROM workout ORDER BY date DESC LIMIT 5")
     suspend fun getRecentWorkouts(): List<Workout>

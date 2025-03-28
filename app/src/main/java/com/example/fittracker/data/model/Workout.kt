@@ -8,7 +8,8 @@ data class Workout(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val date: Long,          // Timestamp do treino
     val duration: Int,       // Duração em minutos
-    val exerciseType: String // Tipo ou nome do exercício
+    val exerciseType: String, // "Ao ar livre" ou "Academia"
+    val exerciseName: String  // Nome específico do exercício
 )
 
 data class WorkoutFrequency(

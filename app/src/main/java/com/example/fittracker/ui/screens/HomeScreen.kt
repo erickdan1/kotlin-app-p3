@@ -226,31 +226,6 @@ fun InfoCard(title: String, value: String) {
 }
 
 @Composable
-fun WorkoutItem(workout: Workout) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = MaterialTheme.shapes.medium,
-        elevation = cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = workout.exerciseType, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Text(
-                text = "Duração: ${workout.duration} min",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-            Text(
-                text = "Data: ${workout.date}",
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-            )
-        }
-    }
-}
-
-@Composable
 fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         "home" to Icons.Filled.Home,
