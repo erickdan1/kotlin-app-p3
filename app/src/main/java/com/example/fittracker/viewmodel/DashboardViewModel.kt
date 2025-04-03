@@ -1,6 +1,7 @@
 package com.example.fittracker.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -38,8 +39,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
         refreshData()
     }
 
-    private fun refreshData() {
+    fun refreshData() {
         viewModelScope.launch {
+            Log.d("DashboardViewModel", "Chamando refreshData()...")
             _totalWorkouts.postValue(repository.getTotalWorkouts())
             _totalDuration.postValue(repository.getTotalDuration() ?: 0)
             _workoutFrequency.postValue(repository.getWorkoutFrequency())

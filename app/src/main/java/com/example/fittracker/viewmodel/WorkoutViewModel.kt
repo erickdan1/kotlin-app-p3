@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.fittracker.data.local.AppDatabase
 import com.example.fittracker.data.model.Workout
 import com.example.fittracker.data.repository.WorkoutRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class WorkoutViewModel(application: Application) : AndroidViewModel(application) {
@@ -21,8 +23,12 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     private var offset = 0
     private val pageSize = 10
 
+    // Evento para notificar que um novo treino foi adicionado
+    private val _workoutAddedEvent = MutableSharedFlow<Unit>(replay = 0)
+    val workoutAddedEvent = _workoutAddedEvent.asSharedFlow()
+
     init {
-        loadWorkouts()
+        loadWorkouts(reset = true)
     }
 
     fun addWorkout(name: String, type: String, duration: Int) {
@@ -34,24 +40,23 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
                 duration = duration
             )
             repository.insertWorkout(newWorkout)
-            // Verificar se a inserção foi bem-sucedida
-            val workoutsAfterInsert = repository.getWorkoutsPaged(pageSize, 0) // Carregar desde o início
-            Log.d("WorkoutViewModel", "Treinos após inserção: $workoutsAfterInsert")
-            loadWorkouts()
+            loadWorkouts(reset = true)
+            _workoutAddedEvent.emit(Unit) // Emite o evento para notificar que um treino foi adicionado
         }
     }
 
-    fun loadWorkouts() {
+    fun loadWorkouts(reset: Boolean = false) {
         viewModelScope.launch {
-            // Resetar o offset quando precisar recarregar a lista do zero
-            if (offset == 0) {
+            if (reset) {
+                offset = 0
                 val newWorkouts = repository.getWorkoutsPaged(pageSize, offset)
                 _workouts.postValue(newWorkouts)
+                offset = pageSize
             } else {
                 val newWorkouts = repository.getWorkoutsPaged(pageSize, offset)
-                _workouts.postValue((_workouts.value ?: emptyList()) + newWorkouts)
+                _workouts.postValue((_workouts.value.orEmpty()) + newWorkouts)
+                offset += pageSize
             }
-            offset += pageSize
         }
     }
 }

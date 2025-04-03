@@ -1,5 +1,6 @@
 package com.example.fittracker.ui.screens
 
+import android.util.Log
 import android.widget.LinearLayout
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -41,6 +43,7 @@ import com.example.fittracker.data.model.Workout
 import com.example.fittracker.data.model.WorkoutFrequency
 import com.example.fittracker.viewmodel.DashboardViewModel
 import com.example.fittracker.viewmodel.UserViewModel
+import com.example.fittracker.viewmodel.WorkoutViewModel
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Description
@@ -55,6 +58,7 @@ import com.github.mikephil.charting.data.LineDataSet
 fun HomeScreen(
     navController: NavController,
     userViewModel: UserViewModel,
+    workoutViewModel: WorkoutViewModel,
     dashboardViewModel: DashboardViewModel
 ) {
     // Observando os dados dos ViewModels
@@ -65,6 +69,17 @@ fun HomeScreen(
     val workoutFrequency by dashboardViewModel.workoutFrequency.observeAsState(emptyList())
     val exerciseComparison by dashboardViewModel.exerciseComparison.observeAsState(emptyList())
     val recentWorkouts by dashboardViewModel.recentWorkouts.observeAsState(emptyList())
+
+    // Observa a lista de treinos e demais dados do dashboard
+    val workouts by workoutViewModel.workouts.observeAsState(emptyList())
+
+    // Coleta o evento de novo treino e atualiza o dashboard
+    LaunchedEffect(Unit) {
+        workoutViewModel.workoutAddedEvent.collect {
+            Log.d("HomeScreen", "Novo treino detectado! Atualizando dashboard...")
+            dashboardViewModel.refreshData()
+        }
+    }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }

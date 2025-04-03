@@ -22,7 +22,7 @@ fun AppNavigation() {
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginScreen(navController, viewModel) }
         composable("register") { RegisterScreen(navController, viewModel) }
-        composable("home") { HomeScreen(navController, viewModel, dashboardViewModel) }
+        composable("home") { HomeScreen(navController, viewModel, workoutViewModel, dashboardViewModel) }
         composable("atividades") { WorkoutScreen(workoutViewModel, navController) }
         composable("perfil") { ProfileScreen(navController, profileViewModel) }
     }
