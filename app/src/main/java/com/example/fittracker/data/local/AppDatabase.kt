@@ -6,11 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.fittracker.data.model.User
 import com.example.fittracker.data.model.Workout
+import com.example.fittracker.data.model.Achievement
 
-@Database(entities = [User::class, Workout::class], version = 1, exportSchema = false)
+@Database(entities = [User::class, Workout::class, Achievement::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun workoutDao(): WorkoutDao
+    abstract fun achievementDao(): AchievementDao
 
     companion object {
         @Volatile private var INSTANCE: AppDatabase? = null

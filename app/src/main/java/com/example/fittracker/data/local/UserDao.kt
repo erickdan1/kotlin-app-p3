@@ -9,8 +9,8 @@ import com.example.fittracker.data.model.User
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM user LIMIT 1")
-    fun getUser(): Flow<User>
+    @Query("SELECT * FROM user WHERE id = 1")
+    suspend fun getUser(): User?
 
     @Update
     suspend fun updateUser(user: User)
