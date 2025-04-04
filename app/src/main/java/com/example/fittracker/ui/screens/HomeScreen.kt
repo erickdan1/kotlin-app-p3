@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -70,17 +71,12 @@ fun HomeScreen(
     val exerciseComparison by dashboardViewModel.exerciseComparison.observeAsState(emptyList())
     val recentWorkouts by dashboardViewModel.recentWorkouts.observeAsState(emptyList())
 
-    // Observa a lista de treinos e demais dados do dashboard
-    val workouts by workoutViewModel.workouts.observeAsState(emptyList())
+    val trigger by workoutViewModel.triggerDashboardRefresh.collectAsState()
 
-    // Coleta o evento de novo treino e atualiza o dashboard
-    LaunchedEffect(Unit) {
-        workoutViewModel.workoutAddedEvent.collect {
-            Log.d("HomeScreen", "Novo treino detectado! Atualizando dashboard...")
-            dashboardViewModel.refreshData()
-        }
+    LaunchedEffect(trigger) {
+        Log.d("HomeScreen", "Novo treino detectado! Atualizando dashboard...")
+        dashboardViewModel.refreshData()
     }
-
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->

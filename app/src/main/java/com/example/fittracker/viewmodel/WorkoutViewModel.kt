@@ -10,6 +10,8 @@ import com.example.fittracker.data.local.AppDatabase
 import com.example.fittracker.data.model.Workout
 import com.example.fittracker.data.repository.WorkoutRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
@@ -23,9 +25,8 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
     private var offset = 0
     private val pageSize = 10
 
-    // Evento para notificar que um novo treino foi adicionado
-    private val _workoutAddedEvent = MutableSharedFlow<Unit>(replay = 0)
-    val workoutAddedEvent = _workoutAddedEvent.asSharedFlow()
+    private val _triggerDashboardRefresh = MutableStateFlow(false)
+    val triggerDashboardRefresh: StateFlow<Boolean> = _triggerDashboardRefresh
 
     init {
         loadWorkouts(reset = true)
@@ -41,7 +42,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
             )
             repository.insertWorkout(newWorkout)
             loadWorkouts(reset = true)
-            _workoutAddedEvent.emit(Unit) // Emite o evento para notificar que um treino foi adicionado
+            _triggerDashboardRefresh.value = !_triggerDashboardRefresh.value // Alterna valor para disparar update
         }
     }
 
