@@ -10,7 +10,7 @@ import com.example.fittracker.data.model.User
 import com.example.fittracker.data.model.Workout
 import com.example.fittracker.data.model.Achievement
 
-@Database(entities = [User::class, Workout::class, Achievement::class], version = 2, exportSchema = false)
+@Database(entities = [User::class, Workout::class, Achievement::class], version = 3, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun workoutDao(): WorkoutDao

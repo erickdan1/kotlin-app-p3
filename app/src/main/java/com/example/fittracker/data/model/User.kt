@@ -10,8 +10,8 @@ data class User(
     val email: String,
     val password: String,
     val profilePicture: String? = null, // URL da foto de perfil
-    val goal: Int? = null, // Meta de treinos
     val age: Int? = null,
     val weight: Float? = null,
-    val height: Float? = null
+    val height: Float? = null,
+    val gender: String? = null // "M" ou "F"
 )

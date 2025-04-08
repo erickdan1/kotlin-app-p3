@@ -33,8 +33,12 @@ fun LoginScreen(navController: NavController, viewModel: UserViewModel) {
     val user by viewModel.userLiveData.observeAsState()
 
     LaunchedEffect(user) {
-        if (user != null) {
-            navController.navigate("home") {
+        user?.let {
+            val isProfileComplete = it.age != null && it.weight != null && it.height != null
+
+            navController.navigate(
+                if (isProfileComplete) "home" else "onboarding"
+            ) {
                 popUpTo("login") { inclusive = true }
             }
         }
