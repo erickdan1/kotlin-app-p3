@@ -23,6 +23,9 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _totalDuration = MutableLiveData<Int>()
     val totalDuration: LiveData<Int> get() = _totalDuration
 
+    private val _totalCalories = MutableLiveData<Float>()
+    val totalCalories: LiveData<Float> get() = _totalCalories
+
     private val _workoutFrequency = MutableLiveData<List<WorkoutFrequency>>()
     val workoutFrequency: LiveData<List<WorkoutFrequency>> get() = _workoutFrequency
 
@@ -44,6 +47,7 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             Log.d("DashboardViewModel", "Chamando refreshData()...")
             _totalWorkouts.postValue(repository.getTotalWorkouts())
             _totalDuration.postValue(repository.getTotalDuration() ?: 0)
+            _totalCalories.postValue(repository.getTotalCaloriesBurned() ?: 0f)
             _workoutFrequency.postValue(repository.getWorkoutFrequency())
             _exerciseComparison.postValue(repository.getExerciseComparison())
             _recentWorkouts.postValue(repository.getRecentWorkouts())

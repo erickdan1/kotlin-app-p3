@@ -112,12 +112,21 @@ fun HomeScreen(
             }
             item {
                 // Cards para Total de Treinos e Tempo Total
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    InfoCard(title = "Total de treinos", value = totalWorkouts.toString())
-                    InfoCard(title = "Tempo total (min)", value = "$totalDuration")
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        InfoCard(title = "Total de treinos", value = totalWorkouts.toString())
+                        InfoCard(title = "Tempo total (min)", value = "$totalDuration")
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        val totalCalories by dashboardViewModel.totalCalories.observeAsState(0f)
+                        InfoCard(title = "Calorias queimadas", value = "${totalCalories.toInt()} kcal")
+                    }
                 }
             }
             item {

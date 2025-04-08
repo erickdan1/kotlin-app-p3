@@ -36,4 +36,8 @@ interface WorkoutDao {
     // Dados para gráfico de barras: contagem de cada exercício praticado
     @Query("SELECT exerciseType, COUNT(*) as count FROM workout GROUP BY exerciseType")
     suspend fun getExerciseComparison(): List<ExerciseComparison>
+
+    // Soma de calorias queimadas
+    @Query("SELECT SUM(caloriesBurned) FROM workout")
+    suspend fun getTotalCaloriesBurned(): Float?
 }

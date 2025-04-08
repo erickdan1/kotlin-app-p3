@@ -9,7 +9,8 @@ data class Workout(
     val date: Long,          // Timestamp do treino
     val duration: Int,       // Duração em minutos
     val exerciseType: String, // "Ao ar livre" ou "Academia"
-    val exerciseName: String  // Nome específico do exercício
+    val exerciseName: String,  // Nome específico do exercício
+    val caloriesBurned: Float? = null
 )
 
 data class WorkoutFrequency(

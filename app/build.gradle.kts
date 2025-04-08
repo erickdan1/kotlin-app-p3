@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,9 +7,22 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
+
+val apiKey = localProperties.getProperty("API_KEY") ?: ""
+val apiId = localProperties.getProperty("API_ID") ?: ""
+
 android {
     namespace = "com.example.fittracker"
     compileSdk = 35
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.example.fittracker"
@@ -20,6 +35,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "API_ID", "\"$apiId\"")
     }
 
     buildTypes {
@@ -82,4 +99,9 @@ dependencies {
     ksp("androidx.room:room-compiler:$room_version")
     // Coroutine
     implementation("androidx.room:room-ktx:$room_version")
+
+    // Retrofit para requisições HTTP
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    // Converter JSON usando Gson
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 }
