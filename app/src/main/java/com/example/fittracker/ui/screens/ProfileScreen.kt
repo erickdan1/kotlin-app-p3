@@ -1,5 +1,6 @@
 package com.example.fittracker.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.example.fittracker.viewmodel.ProfileViewModel
@@ -41,13 +44,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fittracker.data.model.Achievement
+import com.example.fittracker.viewmodel.AchievementViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
+fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, achievementViewModel: AchievementViewModel) {
     val user by viewModel.user.observeAsState()
     val achievements by viewModel.achievements.observeAsState(emptyList())
+
+    // Coleta o trigger para forçar recomposição
+    val trigger by viewModel.triggerProfileRefresh.collectAsState()
+
+    LaunchedEffect(trigger) {
+        Log.d("ProfileScreen", "Trigger atualizado – UI será recomposta!")
+        viewModel.loadUser()
+        viewModel.loadAchievements()
+        achievementViewModel.loadRecentAchievements()
+    }
 
     Scaffold(
         topBar = {
@@ -104,7 +118,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel) {
                     AchievementItem(achievement)
                 }
             }
-            Button(onClick = { /* Navegar para a lista completa de conquistas */ }) {
+            Button(onClick = { navController.navigate("conquistas") }) {
                 Text("Ver mais")
             }
 

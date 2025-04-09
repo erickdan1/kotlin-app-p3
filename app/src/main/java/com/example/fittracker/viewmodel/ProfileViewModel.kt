@@ -11,6 +11,8 @@ import com.example.fittracker.data.model.User
 import com.example.fittracker.data.repository.AchievementRepository
 import kotlinx.coroutines.launch
 import com.example.fittracker.data.repository.UserRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = AppDatabase.getDatabase(application).userDao()
@@ -25,42 +27,46 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
     private val _achievements = MutableLiveData<List<Achievement>>()
     val achievements: LiveData<List<Achievement>> get() = _achievements
 
+    // Trigger para forçar a recomposição da UI
+    private val _triggerProfileRefresh = MutableStateFlow(false)
+    val triggerProfileRefresh: StateFlow<Boolean> = _triggerProfileRefresh
+
     init {
         loadUser()
+        loadAchievements()
     }
 
-    private fun loadUser() {
+    fun loadUser() {
         viewModelScope.launch {
             _user.postValue(repository.getUser())
         }
     }
 
-    private fun loadAchievements() {
+    fun loadAchievements() {
         viewModelScope.launch {
             _achievements.postValue(achievementRepository.getRecentAchievements())
         }
     }
 
-    // Atualiza apenas o nome
-    fun updateUserName(newName: String) {
+    fun updateUserProfile(
+        newName: String? = null,
+        newAge: Int? = null,
+        newWeight: Float? = null,
+        newHeight: Float? = null
+    ) {
         viewModelScope.launch {
             val currentUser = _user.value
             if (currentUser != null) {
-                val updatedUser = currentUser.copy(name = newName)
+                val updatedUser = currentUser.copy(
+                    name = newName ?: currentUser.name,
+                    age = newAge ?: currentUser.age,
+                    weight = newWeight ?: currentUser.weight,
+                    height = newHeight ?: currentUser.height
+                )
                 repository.updateUser(updatedUser)
                 _user.postValue(updatedUser)
-            }
-        }
-    }
-
-    // Atualiza idade, peso e altura
-    fun updateUserDetails(newAge: Int, newWeight: Float, newHeight: Float) {
-        viewModelScope.launch {
-            val currentUser = _user.value
-            if (currentUser != null) {
-                val updatedUser = currentUser.copy(age = newAge, weight = newWeight, height = newHeight)
-                repository.updateUser(updatedUser)
-                _user.postValue(updatedUser)
+                // Alterna o trigger para forçar recomposição
+                _triggerProfileRefresh.value = !_triggerProfileRefresh.value
             }
         }
     }

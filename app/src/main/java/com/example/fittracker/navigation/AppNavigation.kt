@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fittracker.ui.screens.*
+import com.example.fittracker.viewmodel.AchievementViewModel
 import com.example.fittracker.viewmodel.DashboardViewModel
 import com.example.fittracker.viewmodel.OnboardingViewModel
 import com.example.fittracker.viewmodel.ProfileViewModel
@@ -20,6 +21,7 @@ fun AppNavigation() {
     val workoutViewModel: WorkoutViewModel = viewModel()
     val profileViewModel: ProfileViewModel = viewModel()
     val onboardingViewModel: OnboardingViewModel = viewModel()
+    val achievementViewModel: AchievementViewModel = viewModel()
 
     NavHost(navController, startDestination = "login") {
         composable("login") { LoginScreen(navController, viewModel) }
@@ -27,6 +29,7 @@ fun AppNavigation() {
         composable("onboarding") { OnboardingScreen(navController, onboardingViewModel) }
         composable("home") { HomeScreen(navController, viewModel, workoutViewModel, dashboardViewModel) }
         composable("atividades") { WorkoutScreen(workoutViewModel, navController) }
-        composable("perfil") { ProfileScreen(navController, profileViewModel) }
+        composable("perfil") { ProfileScreen(navController, profileViewModel, achievementViewModel) }
+        composable("conquistas") { AchievementsScreen(navController, achievementViewModel) }
     }
 }
