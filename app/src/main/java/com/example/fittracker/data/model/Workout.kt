@@ -19,6 +19,6 @@ data class WorkoutFrequency(
 )
 
 data class ExerciseComparison(
-    val exerciseType: String,
+    val exerciseName: String,
     val count: Int
 )
