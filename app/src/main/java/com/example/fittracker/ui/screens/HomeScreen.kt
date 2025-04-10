@@ -2,7 +2,10 @@ package com.example.fittracker.ui.screens
 
 import android.util.Log
 import android.widget.LinearLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,18 +13,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardElevation
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -34,6 +44,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,11 +105,45 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                // Saudação personalizada
-                Text(
-                    text = "Bem-vindo, ${user?.name ?: "Usuário"}!",
-                    style = MaterialTheme.typography.headlineMedium
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Foto de perfil",
+                            modifier = Modifier.size(56.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column {
+                            Text(
+                                text = "Bem-vindo, ${user?.name ?: "Usuário"}!",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = "Pronto para mais um treino hoje?",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+
+                    IconButton(onClick = {
+                        // Ação do botão de calendário (ex: abrir calendário ou navegação)
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Abrir calendário",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
             item {
                 // Semana X
@@ -115,23 +162,12 @@ fun HomeScreen(
                 )
             }
             item {
-                // Cards para Total de Treinos e Tempo Total
-                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        InfoCard(title = "Total de treinos", value = totalWorkouts.toString())
-                        InfoCard(title = "Tempo total (min)", value = "$totalDuration")
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        val totalCalories by dashboardViewModel.totalCalories.observeAsState(0f)
-                        InfoCard(title = "Calorias queimadas", value = "${totalCalories.toInt()} kcal")
-                    }
-                }
+                val totalCalories by dashboardViewModel.totalCalories.observeAsState(0f)
+                SummaryCard(
+                    totalWorkouts = totalWorkouts,
+                    totalDuration = totalDuration,
+                    totalCalories = totalCalories
+                )
             }
             item {
                 // Gráfico de Linha: Frequência de Treinos
@@ -161,6 +197,11 @@ fun HomeScreen(
             }
             items(recentWorkouts) { workout ->
                 WorkoutItem(workout)
+            }
+            item {
+                Button(onClick = { workoutViewModel.seedWorkouts() }) {
+                    Text("Inserir dados de exemplo")
+                }
             }
         }
     }
@@ -204,7 +245,9 @@ fun WorkoutFrequencyChart(workoutFrequency: List<WorkoutFrequency>) {
                     LinearLayout.LayoutParams.MATCH_PARENT
                 )
                 // Configurações do gráfico
-                description = Description().apply { text = "Frequência de Treinos por Dia" }
+                xAxis.textColor = android.graphics.Color.LTGRAY
+                axisLeft.textColor = android.graphics.Color.LTGRAY
+                legend.textColor = android.graphics.Color.LTGRAY
                 setTouchEnabled(true)
                 setPinchZoom(true)
                 axisRight.isEnabled = false
@@ -222,13 +265,13 @@ fun WorkoutFrequencyChart(workoutFrequency: List<WorkoutFrequency>) {
         },
         update = { lineChart ->
             val dataSet = LineDataSet(entries, "Treinos").apply {
-                color = android.graphics.Color.BLUE
-                valueTextColor = android.graphics.Color.BLACK
+                color = Color(0xFF64B5F6).toArgb()
+                valueTextColor = android.graphics.Color.LTGRAY
                 lineWidth = 2f
                 circleRadius = 6f
                 setDrawCircles(true)
                 setDrawValues(true)
-                setCircleColor(android.graphics.Color.BLUE)
+                setCircleColor(Color(0xFF64B5F6).toArgb())
             }
             lineChart.data = LineData(dataSet)
             lineChart.invalidate()
@@ -248,7 +291,9 @@ fun ExerciseComparisonChart(exerciseComparison: List<ExerciseComparison>) {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT
                 )
-                description = Description().apply { text = "Comparação de Exercícios" }
+                xAxis.textColor = android.graphics.Color.LTGRAY
+                axisLeft.textColor = android.graphics.Color.LTGRAY
+                legend.textColor = android.graphics.Color.LTGRAY
                 setDrawValueAboveBar(true)
                 axisRight.isEnabled = false
             }
@@ -263,20 +308,20 @@ fun ExerciseComparisonChart(exerciseComparison: List<ExerciseComparison>) {
             val dataSet = BarDataSet(entries, "Exercícios").apply {
                 // Lista de cores pré-definida
                 val predefinedColors = listOf(
-                    android.graphics.Color.RED,
-                    android.graphics.Color.GREEN,
-                    android.graphics.Color.BLUE,
-                    android.graphics.Color.MAGENTA,
-                    android.graphics.Color.CYAN,
-                    android.graphics.Color.YELLOW,
-                    android.graphics.Color.LTGRAY
-                )
+                    Color(0xFF64B5F6), // Azul claro
+                    Color(0xFF81C784), // Verde suave
+                    Color(0xFFFFB74D), // Laranja suave
+                    Color(0xFFBA68C8), // Roxo médio
+                    Color(0xFFE57373), // Vermelho claro
+                    Color(0xFF4DD0E1), // Ciano claro
+                    Color(0xFFA1887F)  // Marrom acinzentado
+                ).map { it.toArgb() }
                 // Atribui, para cada entrada, uma cor da lista (ciclando se necessário)
                 val colors = exerciseComparison.mapIndexed { index, _ ->
                     predefinedColors[index % predefinedColors.size]
                 }
                 setColors(colors)
-                valueTextColor = android.graphics.Color.BLACK
+                valueTextColor = android.graphics.Color.LTGRAY
                 valueTextSize = 10f
             }
 
@@ -300,6 +345,76 @@ fun ExerciseComparisonChart(exerciseComparison: List<ExerciseComparison>) {
         }
     )
 }
+
+@Composable
+fun SummaryCard(
+    totalWorkouts: Int,
+    totalDuration: Int,
+    totalCalories: Float
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+            .height(140.dp)
+            .background(
+                color = Color.Transparent,
+                shape = RoundedCornerShape(24.dp)
+            )
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(24.dp)
+            )
+            .clip(RoundedCornerShape(24.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = totalWorkouts.toString(),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "Treinos",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = totalCalories.toInt().toString(),
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "kcal",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = totalDuration.toString(),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = "min",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun InfoCard(title: String, value: String) {

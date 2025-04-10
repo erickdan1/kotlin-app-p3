@@ -87,10 +87,10 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
                 "Você completou pelo menos 10 treinos e 120 minutos no total.", 10, 120, "unhas"),
             AchievementCriteria(3, "Tá saindo da jaula o monstro",
                 "Você completou pelo menos 20 treinos e 300 minutos no total.", 20, 300, "monstro"),
+            AchievementCriteria(4, "Se quiser sim mano",
+                "Você completou pelo menos 30 treinos e 420 minutos no total.", 30, 420, "dino"),
             AchievementCriteria(4, "Yeah buddy!!",
-                "Você completou pelo menos 30 treinos e 420 minutos no total.", 30, 420, "ronnie"),
-            AchievementCriteria(5, "Se quiser sim mano",
-                "Você completou pelo menos 50 treinos e 600 minutos no total.", 50, 600, "dino")
+                "Você completou pelo menos 50 treinos e 600 minutos no total.", 50, 600, "ronnie"),
         )
 
         // Verifique cada critério e, se atingido, insira a conquista (se ainda não estiver desbloqueada)
@@ -108,5 +108,49 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
                 }
             }
         }
+    }
+
+    fun seedWorkouts() {
+        viewModelScope.launch {
+            val workouts = generateSampleWorkouts()
+            workouts.forEach { workoutDao.insertWorkout(it) }
+        }
+    }
+
+    private fun generateSampleWorkouts(): List<Workout> {
+        val outdoorExercises = listOf("Corrida", "Caminhada", "Ciclismo", "Hiking")
+        val gymExercises = listOf("Supino", "Agachamento", "Levantamento Terra", "Rosca Direta")
+
+        val now = System.currentTimeMillis()
+        val oneDay = 24 * 60 * 60 * 1000L
+        val oneHour = 60 * 60 * 1000L
+
+        val workouts = mutableListOf<Workout>()
+
+        for (dayOffset in 0 until 7) {
+            val dayTimestamp = now - dayOffset * oneDay
+            val workoutCount = (1..4).random() // de 1 a 4 treinos por dia
+
+            repeat(workoutCount) { i ->
+                val isOutdoor = listOf(true, false).random()
+                val exerciseList = if (isOutdoor) outdoorExercises else gymExercises
+                val exercise = exerciseList.random()
+                val duration = (15..60).random()
+                val calories = (100..500).random().toFloat()
+                val timestamp = dayTimestamp + i * oneHour * 2 // espaçamento entre os treinos
+
+                workouts.add(
+                    Workout(
+                        date = timestamp,
+                        duration = duration,
+                        exerciseType = if (isOutdoor) "Ao ar livre" else "Academia",
+                        exerciseName = exercise,
+                        caloriesBurned = calories
+                    )
+                )
+            }
+        }
+
+        return workouts
     }
 }

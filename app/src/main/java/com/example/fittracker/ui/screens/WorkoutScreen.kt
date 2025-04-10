@@ -1,14 +1,21 @@
 package com.example.fittracker.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,21 +38,27 @@ import java.util.Date
 import java.util.Locale
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,7 +72,29 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, navController: NavController) {
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Registrar Atividade") }) },
+        topBar = {
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Registrar Atividade",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Medium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                    )
+                )
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                )
+            }
+        },
         bottomBar = { BottomNavigationBar(navController) }
     ) { paddingValues ->
         Column(
@@ -69,12 +104,7 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, navController: NavController) {
                 .padding(16.dp)
         ) {
             // Botão para adicionar nova atividade
-            Button(
-                onClick = { showDialog = true },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Nova Atividade")
-            }
+            AddWorkoutButton(onClick = { showDialog = true })
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -104,38 +134,81 @@ fun WorkoutScreen(viewModel: WorkoutViewModel, navController: NavController) {
 }
 
 @Composable
-fun WorkoutItem(workout: Workout) {
-    val backgroundColor = getWorkoutColor(workout.exerciseType)
-
+fun AddWorkoutButton(onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = 4.dp)
+            .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
+        ),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Adicionar",
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Nova Atividade",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+@Composable
+fun WorkoutItem(workout: Workout) {
+    val backgroundColor = getWorkoutColor(workout.exerciseType).copy(alpha = 0.15f)
+    val borderColor = getWorkoutColor(workout.exerciseType).copy(alpha = 0.4f)
+    val textColor = MaterialTheme.colorScheme.onSurface
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp, horizontal = 12.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+            .border(
+                width = 1.dp,
+                color = borderColor,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(16.dp)
+    ) {
+        Column {
             Text(
                 text = workout.exerciseName,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onPrimary
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp,
+                color = textColor
             )
             Text(
                 text = "Tipo: ${workout.exerciseType}",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f)
+                color = textColor.copy(alpha = 0.85f)
             )
             Text(
                 text = "Duração: ${workout.duration} min",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                color = textColor.copy(alpha = 0.75f)
             )
             Text(
                 text = "Data: ${formatDate(workout.date)}",
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f)
+                color = textColor.copy(alpha = 0.6f)
             )
         }
     }
@@ -264,7 +337,7 @@ fun getMonthYear(timestamp: Long): String {
 fun getWorkoutColor(exerciseType: String): Color {
     return when (exerciseType) {
         "Ao ar livre" -> Color(0xFF4CAF50) // Verde
-        "Academia" -> Color(0xFFFF5722)   // Laranja
-        else -> Color.Gray
+        "Academia" -> Color(0xFFEF6C00)   // Laranja queimado
+        else -> Color(0xFF9E9E9E)         // Cinza
     }
 }
