@@ -1,6 +1,7 @@
 package com.example.fittracker.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,11 +37,16 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import com.example.fittracker.viewmodel.ProfileViewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fittracker.data.model.Achievement
@@ -142,33 +148,60 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, ach
 
 @Composable
 fun AchievementItem(achievement: Achievement) {
+    val context = LocalContext.current
+    val iconResId = remember(achievement.iconUrl) {
+        achievement.iconUrl?.let {
+            context.resources.getIdentifier(it, "drawable", context.packageName)
+        }
+    }
+
+    val itemWidth = (LocalConfiguration.current.screenWidthDp.dp / 3) - 12.dp // 3 itens por linha + padding
+
     Card(
         modifier = Modifier
-            .size(100.dp)
+            .width(itemWidth)
+            .height(220.dp)
             .padding(4.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            // Usar ícone padrão, pois Achievement.icon não vem do banco
-            Icon(
-                imageVector = Icons.Default.Star,
-                contentDescription = "Conquista",
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+            if (iconResId != null && iconResId != 0) {
+                Image(
+                    painter = painterResource(id = iconResId),
+                    contentDescription = "Ícone da conquista",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(bottom = 8.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Conquista",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(bottom = 8.dp)
+                )
+            }
+
             Text(
                 text = achievement.title,
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                maxLines = 1
+                fontSize = 14.sp,
+                maxLines = 2,
+                textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = achievement.description,
-                fontSize = 10.sp,
-                maxLines = 2
+                fontSize = 12.sp,
+                maxLines = 3,
+                textAlign = TextAlign.Center
             )
         }
     }

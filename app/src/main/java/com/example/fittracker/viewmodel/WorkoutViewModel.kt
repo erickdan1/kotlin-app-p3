@@ -82,17 +82,15 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
         // Defina os critérios para cada conquista
         val criteriaList = listOf(
             AchievementCriteria(1, "Aí você tá demonstrando a essência",
-                "Você completou pelo menos 5 treinos e 60 minutos no total.", 5, 60),
+                "Você completou pelo menos 5 treinos e 60 minutos no total.", 5, 60, "bulldog"),
             AchievementCriteria(2, "Eu quero eu posso",
-                "Você completou pelo menos 10 treinos e 120 minutos no total.", 10, 120),
+                "Você completou pelo menos 10 treinos e 120 minutos no total.", 10, 120, "unhas"),
             AchievementCriteria(3, "Tá saindo da jaula o monstro",
-                "Você completou pelo menos 20 treinos e 300 minutos no total.", 20, 300),
+                "Você completou pelo menos 20 treinos e 300 minutos no total.", 20, 300, "monstro"),
             AchievementCriteria(4, "Yeah buddy!!",
-                "Você completou pelo menos 30 treinos e 420 minutos no total.", 30, 420),
+                "Você completou pelo menos 30 treinos e 420 minutos no total.", 30, 420, "ronnie"),
             AchievementCriteria(5, "Se quiser sim mano",
-                "Você completou pelo menos 50 treinos e 600 minutos no total.", 50, 600),
-            AchievementCriteria(6, "Birl!!!",
-                "Você completou pelo menos 100 treinos e 1000 minutos no total.", 100, 1000)
+                "Você completou pelo menos 50 treinos e 600 minutos no total.", 50, 600, "dino")
         )
 
         // Verifique cada critério e, se atingido, insira a conquista (se ainda não estiver desbloqueada)
@@ -104,7 +102,7 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
                         title = criteria.title,
                         description = criteria.description,
                         date = System.currentTimeMillis(),
-                        iconUrl = null
+                        iconUrl = criteria.iconResName
                     )
                     achievementRepository.insertAchievement(achievement)
                 }

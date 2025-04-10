@@ -19,5 +19,6 @@ data class AchievementCriteria(
     val title: String,
     val description: String,
     val minWorkouts: Int,
-    val minDuration: Int // em minutos
+    val minDuration: Int, // em minutos
+    val iconResName: String
 )
