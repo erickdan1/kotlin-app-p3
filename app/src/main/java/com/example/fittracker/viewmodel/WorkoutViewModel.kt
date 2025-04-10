@@ -40,15 +40,16 @@ class WorkoutViewModel(application: Application) : AndroidViewModel(application)
 
     fun addWorkout(name: String, type: String, duration: Int) {
         viewModelScope.launch {
+            val user = userRepository.getUser() ?: return@launch
             // Estima calorias usando a API Nutritionix com os dados do usuário
-            // val calories = repository.estimateCaloriesFromWorkout(name, duration, user)
+            val calories = repository.estimateCaloriesFromWorkout(name, duration, user)
 
             val newWorkout = Workout(
                 date = System.currentTimeMillis(),
                 exerciseName = name,
                 exerciseType = type,
                 duration = duration,
-                // caloriesBurned = calories
+                caloriesBurned = calories
             )
 
             repository.insertWorkout(newWorkout)
